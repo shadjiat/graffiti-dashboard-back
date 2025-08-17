@@ -1,0 +1,21 @@
+{
+  "name": "graffiti-analytics-genkit",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx --watch src/index.ts",
+    "testflow": "tsx src/test.ts"
+  },
+  "dependencies": {
+    "@genkit-ai/core": "latest",
+    "@genkit-ai/flow": "latest",
+    "zod": "latest",
+    "dotenv": "latest",
+    "undici": "latest"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "tsx": "^4.20.0"
+  }
+}
