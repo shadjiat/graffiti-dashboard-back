@@ -1,0 +1,80 @@
+{
+  "domain": "wine",
+  "version": "1.0.0",
+  "language": "fr",
+  "intents": {
+    "compare_products": {
+      "description": "Comparer des vins ou des CTA/produits",
+      "examples": [
+        "compare cta01 et cta02",
+        "quelle différence entre un bordeaux et un bourgogne ?",
+        "lequel est plus fruité ?"
+      ]
+    },
+    "recommend": {
+      "description": "Recommander un vin selon critères goût/prix/usage",
+      "examples": [
+        "un rouge léger pour l'apéro",
+        "un blanc fruité pour du poisson",
+        "un champagne pas trop cher"
+      ]
+    },
+    "filter": {
+      "description": "Filtrer par facettes (goût, cépage, pays, prix...)",
+      "examples": [
+        "montre les rouges légers",
+        "je veux un vin bio",
+        "des bulles pour un budget 15€"
+      ]
+    }
+  },
+  "synonyms": {
+    "bulleux": "petillant",
+    "petillant": "petillant",
+    "effervescent": "petillant",
+    "leger": "leger",
+    "léger": "leger",
+    "fruite": "fruite",
+    "fruité": "fruite",
+    "boise": "boise",
+    "boisé": "boise",
+    "sec": "sec",
+    "demi-sec": "demi-sec",
+    "sucre": "sucre",
+    "sucré": "sucre",
+    "bio": "bio",
+    "biologique": "bio"
+  },
+  "facets": {
+    "color": {
+      "description": "Couleur du vin",
+      "values": ["rouge", "blanc", "rosé", "petillant"],
+      "valueSynonyms": { "rose": "rosé", "champagne": "petillant" }
+    },
+    "taste_profile": {
+      "description": "Profil de goût",
+      "values": ["leger", "fruite", "boise", "sec", "demi-sec", "sucre"]
+    },
+    "grape": {
+      "description": "Cépage",
+      "values": ["merlot", "cabernet", "pinot noir", "chardonnay", "sauvignon"]
+    },
+    "origin": {
+      "description": "Origine/terroir",
+      "values": ["bordeaux", "bourgogne", "alsace", "cotes du rhone", "loire", "champagne", "italie", "espagne"]
+    },
+    "price_band": {
+      "description": "Tranches de prix",
+      "values": ["<10", "10-15", "15-25", "25-50", "50+"]
+    },
+    "label": {
+      "description": "Labels/engagements",
+      "values": ["bio", "biodynamie", "vegan"]
+    }
+  },
+  "patterns": {
+    "price_number": "(\\d+[\\.,]?\\d*)\\s*€",
+    "top_n": "\\btop\\s*(\\d{1,2})\\b"
+  },
+  "meta": { "source": "base" }
+}

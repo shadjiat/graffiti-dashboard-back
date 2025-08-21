@@ -1,3 +1,3 @@
-import 'dotenv/config';
-import './flows/analyze-cta-performance';
-console.log("Boot OK");
+// src/index.ts
+export { default as analyzeCtaPerformance } from "./flows/analyze-cta-performance";
+export { default as ctaTimeseries } from "./flows/cta-timeseries";

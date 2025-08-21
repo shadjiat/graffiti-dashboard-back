@@ -1,19 +1,28 @@
-import { runFlow } from '@genkit-ai/flow';
-import { analyzeCtaPerformance } from './flows/analyze-cta-performance';
+// src/test-timeseries.ts
+// ASCII only test runner.
+
+import "dotenv/config";
+import { ctaTimeseries } from "./flows";
 
 async function main() {
-  const result = await runFlow(analyzeCtaPerformance, {
-    question: 'Which CTA performed best?',
-    eventName: 'User Authenticated', // << ton event exact
-    property: 'appClipParameterR',                   // << ta propriété
-    range: { from: '2025-07-25', to: '2025-08-17' }, // << ta période
-    // where: "ev.properties.user_type === 'authenticated'", // optionnel
-  });
+  console.log("Running ctaTimeseries test...");
 
-  console.log('Flow result:', JSON.stringify(result, null, 2));
+  const input = {
+    query: "Top CTAs over 30 days",
+    event: "User Authenticated",
+    property: "appClipParameterR",
+    days: 30,
+    top: 5,
+    granularity: "day" as const,
+  };
+
+  try {
+    const res = await ctaTimeseries(input);
+    console.log(JSON.stringify(res, null, 2));
+  } catch (err) {
+    console.error("Error:", err);
+    process.exit(1);
+  }
 }
 
-main().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+main();
