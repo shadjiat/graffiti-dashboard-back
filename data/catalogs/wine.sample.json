@@ -1,0 +1,102 @@
+{
+  "domain": "wine",
+  "version": "1.0.0",
+  "items": [
+    {
+      "id": "w-merlot-01",
+      "name": "Merlot Souple La Renaude 2022",
+      "color": "rouge",
+      "taste_profile": ["leger", "fruite"],
+      "grape": ["merlot"],
+      "origin": "bordeaux",
+      "price_eur": 9.9,
+      "labels": ["bio"],
+      "store_sku": "MONO-REN-001",
+      "esl_capable": true
+    },
+    {
+      "id": "w-pinot-02",
+      "name": "Pinot Noir Doux Vallons 2021",
+      "color": "rouge",
+      "taste_profile": ["leger"],
+      "grape": ["pinot noir"],
+      "origin": "bourgogne",
+      "price_eur": 14.5,
+      "labels": [],
+      "store_sku": "MONO-REN-002",
+      "esl_capable": true
+    },
+    {
+      "id": "w-blanc-01",
+      "name": "Sauvignon Frais de Loire 2023",
+      "color": "blanc",
+      "taste_profile": ["sec", "fruite"],
+      "grape": ["sauvignon"],
+      "origin": "loire",
+      "price_eur": 8.5,
+      "labels": ["bio"],
+      "store_sku": "MONO-REN-003",
+      "esl_capable": false
+    },
+    {
+      "id": "w-chardo-01",
+      "name": "Chardonnay Bois Doré 2022",
+      "color": "blanc",
+      "taste_profile": ["boise", "demi-sec"],
+      "grape": ["chardonnay"],
+      "origin": "bourgogne",
+      "price_eur": 16.9,
+      "labels": [],
+      "store_sku": "MONO-REN-004",
+      "esl_capable": true
+    },
+    {
+      "id": "w-rose-01",
+      "name": "Rosé Clair de Provence 2023",
+      "color": "rosé",
+      "taste_profile": ["leger", "fruite"],
+      "grape": ["grenache"],
+      "origin": "provence",
+      "price_eur": 12.0,
+      "labels": ["vegan"],
+      "store_sku": "MONO-REN-005",
+      "esl_capable": true
+    },
+    {
+      "id": "w-bulles-01",
+      "name": "Brut Petillant Cuvée Maison",
+      "color": "petillant",
+      "taste_profile": ["sec"],
+      "grape": ["chardonnay", "pinot noir"],
+      "origin": "champagne",
+      "price_eur": 24.9,
+      "labels": [],
+      "store_sku": "MONO-REN-006",
+      "esl_capable": true
+    },
+    {
+      "id": "w-rouge-15-01",
+      "name": "Rouge Léger de Terrasse 2022",
+      "color": "rouge",
+      "taste_profile": ["leger", "fruite"],
+      "grape": ["merlot", "cabernet"],
+      "origin": "languedoc",
+      "price_eur": 15.0,
+      "labels": [],
+      "store_sku": "MONO-REN-007",
+      "esl_capable": false
+    },
+    {
+      "id": "w-rouge-20-01",
+      "name": "Côtes du Rhône Classique",
+      "color": "rouge",
+      "taste_profile": ["fruite"],
+      "grape": ["grenache", "syrah"],
+      "origin": "cotes du rhone",
+      "price_eur": 19.9,
+      "labels": ["bio"],
+      "store_sku": "MONO-REN-008",
+      "esl_capable": true
+    }
+  ]
+}

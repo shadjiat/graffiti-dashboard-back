@@ -1,0 +1,64 @@
+{
+  "items": [
+    {
+      "sku": "wine-001",
+      "name": "Bordeaux Rouge – Fruité & Léger",
+      "facets": { "color": "rouge", "taste_profile": ["leger", "fruite"], "origin": "bordeaux" },
+      "price_eur": 12.0
+    },
+    {
+      "sku": "wine-002",
+      "name": "Bourgogne Pinot Noir – Léger",
+      "facets": { "color": "rouge", "taste_profile": ["leger"], "grape": "pinot noir", "origin": "bourgogne" },
+      "price_eur": 18.5
+    },
+    {
+      "sku": "wine-003",
+      "name": "Loire Sauvignon – Blanc Sec",
+      "facets": { "color": "blanc", "taste_profile": ["sec", "fruite"], "grape": "sauvignon", "origin": "loire" },
+      "price_eur": 9.9
+    },
+    {
+      "sku": "wine-004",
+      "name": "Chardonnay – Blanc Boisé",
+      "facets": { "color": "blanc", "taste_profile": ["boise"], "grape": "chardonnay", "origin": "bourgogne" },
+      "price_eur": 14.9
+    },
+    {
+      "sku": "wine-005",
+      "name": "Crémant d’Alsace – Pétillant",
+      "facets": { "color": "petillant", "taste_profile": ["fruite"], "origin": "alsace" },
+      "price_eur": 11.5
+    },
+    {
+      "sku": "wine-006",
+      "name": "Rosé de Provence – Sec",
+      "facets": { "color": "rosé", "taste_profile": ["sec", "leger"], "origin": "loire" },
+      "price_eur": 8.5
+    },
+    {
+      "sku": "wine-007",
+      "name": "Côtes du Rhône – Rouge",
+      "facets": { "color": "rouge", "taste_profile": ["fruite"], "origin": "cotes du rhone" },
+      "price_eur": 7.9
+    },
+    {
+      "sku": "wine-008",
+      "name": "Champagne Brut – Pétillant",
+      "facets": { "color": "petillant", "taste_profile": ["sec"], "origin": "champagne" },
+      "price_eur": 29.9
+    },
+    {
+      "sku": "wine-009",
+      "name": "Rouge Bio d’Espagne",
+      "facets": { "color": "rouge", "taste_profile": ["leger"], "origin": "espagne", "label": "bio" },
+      "price_eur": 10.9
+    },
+    {
+      "sku": "wine-010",
+      "name": "Rosé Bio – Languedoc",
+      "facets": { "color": "rosé", "taste_profile": ["fruite"], "origin": "languedoc", "label": "bio" },
+      "price_eur": 9.2
+    }
+  ]
+}
