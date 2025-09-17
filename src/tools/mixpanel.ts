@@ -1,13 +1,6 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-// 🛠️ Log temporaire (debug uniquement)
-console.log(
-  "Loaded ENV:",
-  process.env.MIXPANEL_PROJECT_ID,
-  process.env.MIXPANEL_SERVICE_ACCOUNT,
-  process.env.MIXPANEL_SECRET ? "SECRET_OK" : "SECRET_MISSING"
-);
 import fetch from "node-fetch";
 
 const MIXPANEL_PROJECT_ID = process.env.MIXPANEL_PROJECT_ID;
@@ -19,7 +12,7 @@ if (!MIXPANEL_PROJECT_ID || !MIXPANEL_SERVICE_ACCOUNT || !MIXPANEL_SECRET) {
 }
 
 async function jql(script: string, params: Record<string, any> = {}) {
-const url = `https://eu.mixpanel.com/api/2.0/jql?project_id=${MIXPANEL_PROJECT_ID}`;
+  const url = `https://eu.mixpanel.com/api/2.0/jql?project_id=${MIXPANEL_PROJECT_ID}`;
   const auth = Buffer.from(
     `${MIXPANEL_SERVICE_ACCOUNT}:${MIXPANEL_SECRET}`
   ).toString("base64");

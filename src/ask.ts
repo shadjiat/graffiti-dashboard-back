@@ -40,7 +40,7 @@ async function main() {
         property: p.property,
         days: p.days,
         top: p.top,
-        // granularity est toujours "day" côté JQL aujourd'hui
+        granularity: p.granularity,
       } as any);
       console.log("✅ Result:\n", JSON.stringify(res, null, 2));
       return;

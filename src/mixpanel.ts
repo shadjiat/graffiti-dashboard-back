@@ -5,6 +5,12 @@ const PROJECT_ID = process.env.MIXPANEL_PROJECT_ID;
 const SERVICE_ACCOUNT = process.env.MIXPANEL_SERVICE_ACCOUNT;
 const SECRET = process.env.MIXPANEL_SECRET;
 
+if (!PROJECT_ID || !SERVICE_ACCOUNT || !SECRET) {
+  throw new Error(
+    "Missing Mixpanel env (MIXPANEL_PROJECT_ID, MIXPANEL_SERVICE_ACCOUNT, MIXPANEL_SECRET)."
+  );
+}
+
 // Si rien n’est défini, on suppose l’hébergement EU.
 const API_HOST = (process.env.MIXPANEL_API_HOST ?? "").trim() || "https://api-eu.mixpanel.com";
 
@@ -16,14 +22,10 @@ export async function jql<T>(script: string, params: JqlParams = {}): Promise<T>
   bodyParams.set("params", JSON.stringify(params));
   bodyParams.set("project", PROJECT_ID?.toString() ?? "");
 
-  // === DIAGNOSTIC ===
-  console.log("mixpanel.ts] DIAG --- PROJECT_ID:", PROJECT_ID ?? "(undefined)");
-  console.log("mixpanel.ts] DIAG --- API_HOST:", API_HOST);
   const url = `${API_HOST}/api/2.0/jql`;
-  console.log("mixpanel.ts] DIAG --- URL appelée:", url);
 
-  // Pour JQL : Basic Auth avec uniquement l’API Secret en username
-  const auth = Buffer.from(`${SECRET}:`).toString("base64");
+  // Align auth with Mixpanel best practices: service account + secret.
+  const auth = Buffer.from(`${SERVICE_ACCOUNT}:${SECRET}`).toString("base64");
 
   const res = await fetch(url.toString(), {
     method: "POST",
