@@ -18,6 +18,8 @@ const AUTH = "Basic " + Buffer.from(`${MIXPANEL_USERNAME}:${MIXPANEL_SECRET}`).t
 const JQL_URL = `${API_HOST}/api/2.0/jql?project_id=${MIXPANEL_PROJECT_ID}`;
 
 /** ====== HELPERS ====== */
+type Granularity = "day" | "week" | "month";
+
 function daysAgo(n: number) {
   const d = new Date();
   d.setUTCDate(d.getUTCDate() - n);
@@ -33,6 +35,71 @@ function dateRange(from: string, to: string): string[] {
     d.setUTCDate(d.getUTCDate() + 1);
   }
   return out;
+}
+
+function startOfWeek(date: string) {
+  const d = new Date(date + "T00:00:00.000Z");
+  const day = d.getUTCDay();
+  const diff = (day + 6) % 7; // 0 for Monday, 6 for Sunday
+  d.setUTCDate(d.getUTCDate() - diff);
+  return d.toISOString().slice(0, 10);
+}
+
+function startOfMonth(date: string) {
+  const d = new Date(date + "T00:00:00.000Z");
+  d.setUTCDate(1);
+  return d.toISOString().slice(0, 10);
+}
+
+function bucketStart(date: string, granularity: Granularity): string {
+  if (granularity === "week") return startOfWeek(date);
+  if (granularity === "month") return startOfMonth(date);
+  return date;
+}
+
+function collectBuckets(days: string[], granularity: Granularity): string[] {
+  if (granularity === "day") return days;
+  const seen = new Set<string>();
+  const buckets: string[] = [];
+  for (const day of days) {
+    const bucket = bucketStart(day, granularity);
+    if (!seen.has(bucket)) {
+      seen.add(bucket);
+      buckets.push(bucket);
+    }
+  }
+  return buckets;
+}
+
+function buildSeriesForGranularity(
+  values: string[],
+  days: string[],
+  byValue: Record<string, Record<string, number>>,
+  granularity: Granularity
+) {
+  const bucketDates = collectBuckets(days, granularity);
+  const series = values.map((value) => {
+    const valueMap = byValue[value] || {};
+    if (granularity === "day") {
+      const points = days.map((d) => ({ date: d, count: valueMap[d] ?? 0 }));
+      const total = points.reduce((acc, p) => acc + p.count, 0);
+      return { value, total, points };
+    }
+
+    const bucketCounts: Record<string, number> = {};
+    for (const day of days) {
+      const bucket = bucketStart(day, granularity);
+      bucketCounts[bucket] = (bucketCounts[bucket] ?? 0) + (valueMap[day] ?? 0);
+    }
+    const points = bucketDates.map((bucket) => ({
+      date: bucket,
+      count: bucketCounts[bucket] ?? 0,
+    }));
+    const total = points.reduce((acc, p) => acc + p.count, 0);
+    return { value, total, points };
+  });
+
+  return { series, dates: bucketDates };
 }
 
 async function jql(script: string, params: Record<string, unknown>) {
@@ -112,7 +179,7 @@ const InputSchema = z.object({
   top: z.number().int().positive().default(5),
   /** Permet de forcer les valeurs (ex: ["cta01","cta02"]). Si présent, prioritaire sur top. */
   values: z.array(z.string()).optional(),
-  granularity: z.enum(["day"]).default("day"), // conservé pour compat
+  granularity: z.enum(["day", "week", "month"]).default("day"),
 });
 type Input = z.infer<typeof InputSchema>;
 
@@ -123,7 +190,7 @@ const OutputSchema = z.object({
     property: z.string(),
     from: z.string(),
     to: z.string(),
-    granularity: z.enum(["day"]),
+    granularity: z.enum(["day", "week", "month"]),
     top: z.number().int().positive().optional(),
     values: z.array(z.string()).optional(),
   }),
@@ -142,6 +209,7 @@ type Output = z.infer<typeof OutputSchema>;
 export async function ctaTimeseriesHandler(input: Input): Promise<Output> {
   const to = daysAgo(0);
   const from = daysAgo(input.days);
+  const days = dateRange(from, to);
 
   // Déterminer l’ensemble de valeurs à tracer
   let chosen: string[] = [];
@@ -164,6 +232,7 @@ export async function ctaTimeseriesHandler(input: Input): Promise<Output> {
   }
 
   if (chosen.length === 0) {
+    const bucketDates = collectBuckets(days, input.granularity);
     return {
       answer: `No data for "${input.event}" by "${input.property}" between ${from} and ${to}.`,
       used: {
@@ -171,12 +240,12 @@ export async function ctaTimeseriesHandler(input: Input): Promise<Output> {
         property: input.property,
         from,
         to,
-        granularity: "day",
+        granularity: input.granularity,
         ...(usedTop ? { top: usedTop } : {}),
         ...(usedValues ? { values: usedValues } : {}),
       },
       series: [],
-      dates: dateRange(from, to),
+      dates: bucketDates,
     };
   }
 
@@ -193,7 +262,6 @@ export async function ctaTimeseriesHandler(input: Input): Promise<Output> {
   })) as Array<{ day: string; value: string; count: number }>;
 
   // Densification
-  const days = dateRange(from, to);
   const byValue: Record<string, Record<string, number>> = {};
   for (const v of chosen) {
     byValue[v] = {};
@@ -204,26 +272,21 @@ export async function ctaTimeseriesHandler(input: Input): Promise<Output> {
       byValue[r.value][r.day] = r.count;
     }
   }
-
-  const series = chosen.map((v) => {
-    const points = days.map((d) => ({ date: d, count: byValue[v][d] || 0 }));
-    const total = points.reduce((acc, p) => acc + p.count, 0);
-    return { value: v, total, points };
-  });
+  const { series, dates } = buildSeriesForGranularity(chosen, days, byValue, input.granularity);
 
   return {
-    answer: `Timeseries for "${input.property}" on "${input.event}" from ${from} to ${to} (${usedValues ? `values=${JSON.stringify(usedValues)}` : `top ${usedTop} values`}, day).`,
+    answer: `Timeseries for "${input.property}" on "${input.event}" from ${from} to ${to} (${usedValues ? `values=${JSON.stringify(usedValues)}` : `top ${usedTop} values`}, ${input.granularity}).`,
     used: {
       event: input.event,
       property: input.property,
       from,
       to,
-      granularity: "day",
+      granularity: input.granularity,
       ...(usedTop ? { top: usedTop } : {}),
       ...(usedValues ? { values: usedValues } : {}),
     },
     series,
-    dates: days,
+    dates,
   };
 }
 

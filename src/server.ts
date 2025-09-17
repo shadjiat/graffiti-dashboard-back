@@ -70,6 +70,18 @@ function parseValuesParam(v: unknown): string[] | undefined {
   return cleaned.length ? cleaned : undefined;
 }
 
+function parsePositiveInteger(raw: unknown): number | null {
+  const parsed = Number(raw);
+  if (!Number.isFinite(parsed) || !Number.isInteger(parsed) || parsed <= 0) {
+    return null;
+  }
+  return parsed;
+}
+
+function isGranularity(value: string): value is "day" | "week" | "month" {
+  return value === "day" || value === "week" || value === "month";
+}
+
 /** Health check */
 app.get("/health", (_req, res) => {
   const ok =
@@ -219,11 +231,51 @@ app.get("/_links", (req, res) => {
  */
 app.get("/cta-timeseries", async (req, res) => {
   try {
-    const event = String(req.query.event || "");
-    const property = String(req.query.property || "");
-    const days = Number(req.query.days || 30);
-    const top = Number(req.query.top || 5);
-    const granularity = String(req.query.granularity || "day") as "day" | "week" | "month";
+    const eventRaw = Array.isArray(req.query.event) ? req.query.event[0] : req.query.event;
+    const propertyRaw = Array.isArray(req.query.property)
+      ? req.query.property[0]
+      : req.query.property;
+    const event = typeof eventRaw === "string" ? eventRaw.trim() : "";
+    const property = typeof propertyRaw === "string" ? propertyRaw.trim() : "";
+
+    const daysRaw = Array.isArray(req.query.days) ? req.query.days[0] : req.query.days;
+    let days = 30;
+    if (daysRaw !== undefined) {
+      const parsed = parsePositiveInteger(daysRaw);
+      if (parsed === null) {
+        return res
+          .status(400)
+          .json({ error: "Invalid query param: days must be a positive integer." });
+      }
+      days = parsed;
+    }
+
+    const topRaw = Array.isArray(req.query.top) ? req.query.top[0] : req.query.top;
+    let top = 5;
+    if (topRaw !== undefined) {
+      const parsed = parsePositiveInteger(topRaw);
+      if (parsed === null) {
+        return res
+          .status(400)
+          .json({ error: "Invalid query param: top must be a positive integer." });
+      }
+      top = parsed;
+    }
+
+    const granularityRaw = Array.isArray(req.query.granularity)
+      ? req.query.granularity[0]
+      : req.query.granularity;
+    let granularity: "day" | "week" | "month" = "day";
+    if (granularityRaw !== undefined) {
+      const normalized = String(granularityRaw).toLowerCase();
+      if (!isGranularity(normalized)) {
+        return res.status(400).json({
+          error: "Invalid query param: granularity must be one of day, week or month.",
+        });
+      }
+      granularity = normalized;
+    }
+
     const values = parseValuesParam(req.query.values);
 
     if (!event || !property) {

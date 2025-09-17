@@ -11,12 +11,18 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 const GEMINI_API_KEY = process.env.GOOGLE_API_KEY;
 const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-1.5-pro";
 
-if (!GEMINI_API_KEY) {
-  throw new Error("Missing GOOGLE_API_KEY in .env (clé API Gemini).");
-}
+let cachedModel: ReturnType<GoogleGenerativeAI["getGenerativeModel"]> | null = null;
 
-const genai = new GoogleGenerativeAI(GEMINI_API_KEY);
-const model = genai.getGenerativeModel({ model: GEMINI_MODEL });
+function requireModel() {
+  if (!GEMINI_API_KEY) {
+    throw new Error("Missing GOOGLE_API_KEY in .env (clé API Gemini).");
+  }
+  if (!cachedModel) {
+    const genai = new GoogleGenerativeAI(GEMINI_API_KEY);
+    cachedModel = genai.getGenerativeModel({ model: GEMINI_MODEL });
+  }
+  return cachedModel;
+}
 
 type IntentTopCta = {
   intent: "top_cta";
@@ -95,6 +101,7 @@ export async function routeWithGemini(
   question: string,
   domainPack?: DomainPackLike
 ): Promise<GeminiRouting> {
+  const model = requireModel();
   const langNote = domainPack?.language ? `Langue de l'utilisateur: ${domainPack.language}\n` : "";
   const packSnippet = domainPack
     ? `Contexte domaine (JSON compact; facettes/synonymes/patterns utiles):
